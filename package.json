@@ -1,0 +1,26 @@
+{
+  "name": "demo-app",
+  "version": "1.0.0",
+  "description": "A vulnerable note-taking application for security demonstration",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.5",
+    "bcrypt": "^5.1.1",
+    "express-session": "^1.17.3",
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.9",
+    "dotenv": "^16.3.1",
+    "child_process": "^1.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": ["express", "mysql", "notes", "vulnerable"],
+  "author": "Demo",
+  "license": "MIT"
+} 

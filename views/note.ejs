@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= note.title %> - Vulnerable Notes App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .nav { background: #333; color: white; padding: 10px; margin: -20px -20px 20px -20px; }
+        .nav a { color: white; text-decoration: none; margin-right: 15px; }
+        .nav a:hover { text-decoration: underline; }
+        .note-header { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 20px; }
+        .note-title { font-size: 2em; margin: 0 0 10px 0; }
+        .note-meta { color: #666; margin-bottom: 10px; }
+        .note-content { line-height: 1.6; margin: 20px 0; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; }
+        .btn:hover { background: #0056b3; }
+        .api-info { background: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 4px; border-left: 4px solid #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">Home</a>
+            <a href="/public-notes">Public Notes</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/create-note">Create Note</a>
+            <a href="/backup">Backup</a>
+            <a href="/logout">Logout</a>
+        </div>
+        
+        <div class="note-header">
+            <h1 class="note-title"><%= note.title %></h1>
+            <div class="note-meta">
+                By: <%= note.author %> | 
+                <%= note.is_public ? 'Public' : 'Private' %> | 
+                Created: <%= new Date(note.created_at).toLocaleString() %>
+            </div>
+        </div>
+        
+        <div class="note-content">
+            <%- note.content %>
+        </div>
+        
+        <a href="/dashboard" class="btn">Back to Dashboard</a>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup Notes - Vulnerable Notes App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .nav { background: #333; color: white; padding: 10px; margin: -20px -20px 20px -20px; }
+        .nav a { color: white; text-decoration: none; margin-right: 15px; }
+        .nav a:hover { text-decoration: underline; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        select, input[type="text"] { 
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+        }
+        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        .btn:hover { background: #0056b3; }
+        .btn-secondary { background: #6c757d; }
+        .info-box { background: #e9ecef; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+        .format-options { display: none; margin-top: 10px; }
+        .format-options.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">Home</a>
+            <a href="/public-notes">Public Notes</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/create-note">Create Note</a>
+            <a href="/backup">Backup</a>
+            <a href="/logout">Logout</a>
+        </div>
+        
+        <h1>Backup Notes</h1>
+        
+        <div class="info-box">
+            <strong>Note:</strong> Create a backup of your personal notes in your preferred format. 
+            The backup will be saved on the server and you'll be notified when it's ready.
+        </div>
+        
+        <form method="POST" action="/backup-notes">
+            <div class="form-group">
+                <label for="format-type">Output Format:</label>
+                <select id="format-type" onchange="toggleCustomFormat()">
+                    <option value="cat">Plain Text</option>
+                    <option value="gzip">Compressed (gzip)</option>
+                    <option value="head -n 100">First 100 lines only</option>
+                    <option value="tail -n 50">Last 50 lines only</option>
+                    <option value="custom">Custom format...</option>
+                </select>
+            </div>
+            
+            <div id="custom-format" class="format-options">
+                <div class="form-group">
+                    <label for="format">Custom Format Command:</label>
+                    <input type="text" id="format" name="format" placeholder="e.g., sort, uniq, grep 'important'">
+                    <small style="color: #666;">Specify a custom processing command for your backup.</small>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Create Backup</button>
+            <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+
+    <script>
+        function toggleCustomFormat() {
+            const formatType = document.getElementById('format-type');
+            const customFormat = document.getElementById('custom-format');
+            const formatInput = document.getElementById('format');
+            
+            if (formatType.value === 'custom') {
+                customFormat.classList.add('show');
+                formatInput.required = true;
+            } else {
+                customFormat.classList.remove('show');
+                formatInput.required = false;
+                formatInput.value = formatType.value;
+            }
+        }
+        
+        // Set initial format value
+        document.getElementById('format').value = document.getElementById('format-type').value;
+        
+        // Update format when dropdown changes
+        document.getElementById('format-type').addEventListener('change', function() {
+            if (this.value !== 'custom') {
+                document.getElementById('format').value = this.value;
+            }
+        });
+    </script>
+</body>
+</html> 

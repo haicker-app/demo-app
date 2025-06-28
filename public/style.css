@@ -1,0 +1,12 @@
+/* Application stylesheet */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+.secret-admin-panel {
+    display: none;
+    background: red;
+    color: white;
+    padding: 20px;
+} 
