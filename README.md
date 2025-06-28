@@ -1,6 +1,6 @@
-# Notes Application
+# Vibe-Coded Notes Application
 
-A simple Node.js Express note-taking application with user authentication and public/private note sharing.
+A simple vibe-coded Node.js Express note-taking application with user authentication and public/private note sharing.
 
 ## Setup Instructions
 
@@ -17,16 +17,23 @@ npm install
 ```
 
 2. Set up MySQL database:
+
+2.1 using existing MySQL server
 ```sql
 CREATE DATABASE noteapp;
 ```
 
+2.2 using docker
+```bash
+docker run --name=notes-mysql -p3306:3306 -e 'MYSQL_ROOT_HOST=%' \
+  -e MYSQL_DATABASE=noteapp -e MYSQL_ROOT_PASSWORD=your_mysql_password -d mysql/mysql-server
+```
+Note: root password (your_mysql_password) should be changed
+
 3. Create environment variables file (`.env`):
 ```
 DB_HOST=localhost
-DB_USER=root
 DB_PASSWORD=your_mysql_password
-DB_NAME=noteapp
 ```
 
 4. Start the application:
@@ -35,33 +42,3 @@ npm start
 ```
 
 The application will be available at `http://localhost:3000`
-
-## Features
-
-- User registration and authentication
-- Note creation with public/private visibility
-- Dashboard for managing notes
-- Public notes browsing (no authentication required)
-- API endpoints for note access
-- Static file serving
-- Note backup functionality
-
-## Usage
-
-### Getting Started
-
-1. Register a new user account at `/register`
-2. Login at `/login`
-3. Create notes with different privacy settings
-4. Browse public notes shared by the community
-5. Use the search functionality to find specific notes
-6. Backup your notes using the backup feature
-
-## API Endpoints
-
-- **`/api/notes/:id`** - Get note details
-- **`/static?file=path`** - Serve static files
-
-## Support
-
-If you encounter any issues or have questions about using the application, please create an issue in the repository.
