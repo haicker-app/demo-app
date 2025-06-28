@@ -43,6 +43,14 @@
             <div class="form-group">
                 <label for="content">Content:</label>
                 <textarea id="content" name="content" required placeholder="Enter your note content here..."></textarea>
+                <div style="margin-top: 10px;">
+                    <label for="preview-url">Add link preview (optional):</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="url" id="preview-url" placeholder="https://example.com" style="flex: 1;">
+                        <button type="button" id="preview-btn" onclick="fetchPreview()" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 4px;">Preview</button>
+                    </div>
+                    <div id="preview-result" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; display: none;"></div>
+                </div>
             </div>
             
             <div class="form-group">
@@ -56,5 +64,71 @@
             <a href="/dashboard" class="btn" style="background: #6c757d; margin-left: 10px;">Cancel</a>
         </form>
     </div>
+
+    <script>
+        async function fetchPreview() {
+            const url = document.getElementById('preview-url').value;
+            const resultDiv = document.getElementById('preview-result');
+            const btn = document.getElementById('preview-btn');
+            
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+            
+            btn.textContent = 'Loading...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/link-preview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Extract title from response body if it's HTML
+                    let title = 'Link';
+                    if (data.contentType && data.contentType.includes('text/html')) {
+                        const titleMatch = data.body.match(/<title[^>]*>([^<]*)<\/title>/i);
+                        title = titleMatch ? titleMatch[1].trim() : 'Webpage';
+                    }
+                    
+                    resultDiv.innerHTML = `
+                        <strong>Preview:</strong><br>
+                        <strong>Title:</strong> ${title}<br>
+                        <strong>URL:</strong> ${data.url}<br>
+                        <strong>Status:</strong> ${data.status}<br>
+                        <strong>Content-Type:</strong> ${data.contentType}<br>
+                        <details style="margin-top: 10px;">
+                            <summary>Raw Response</summary>
+                            <pre style="background: #f1f1f1; padding: 10px; border-radius: 4px; max-height: 200px; overflow-y: auto; font-size: 12px;">${data.body.substring(0, 1000)}${data.body.length > 1000 ? '...' : ''}</pre>
+                        </details>
+                        <button onclick="addToNote('${title.replace(/'/g, "\\'")}', '${data.url}')" style="margin-top: 5px; background: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 3px;">Add to Note</button>
+                    `;
+                    resultDiv.style.display = 'block';
+                } else {
+                    resultDiv.innerHTML = `<span style="color: red;">Error: ${data.error}</span>`;
+                    resultDiv.style.display = 'block';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: red;">Failed to fetch preview</span>`;
+                resultDiv.style.display = 'block';
+            }
+            
+            btn.textContent = 'Preview';
+            btn.disabled = false;
+        }
+        
+        function addToNote(title, url) {
+            const content = document.getElementById('content');
+            const linkText = `\n\nLink: ${title}\n${url}`;
+            content.value += linkText;
+        }
+    </script>
 </body>
 </html> 

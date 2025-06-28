@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
+const https = require('https');
+const http = require('http');
 require('dotenv').config();
 
 const app = express();
@@ -114,7 +116,19 @@ app.post('/register', async (req, res) => {
       (err, result) => {
         if (err) {
           console.error(err);
-          res.status(400).send('Registration failed');
+          
+          // Check for duplicate entry errors
+          if (err.code === 'ER_DUP_ENTRY') {
+            if (err.message.includes('username')) {
+              res.status(400).send('Username already exists. Please choose a different username.');
+            } else if (err.message.includes('email')) {
+              res.status(400).send('Email already registered. Please use a different email or login.');
+            } else {
+              res.status(400).send('Username or email already exists.');
+            }
+          } else {
+            res.status(400).send('Registration failed. Please try again.');
+          }
         } else {
           res.redirect('/login');
         }
@@ -214,29 +228,8 @@ app.post('/create-note', requireAuth, (req, res) => {
 app.get('/notes/:id', (req, res) => {
   const noteId = req.params.id;
   
-  db.query(
-    'SELECT notes.*, users.username as author FROM notes JOIN users ON notes.author_id = users.id WHERE notes.id = ?',
-    [noteId],
-    (err, results) => {
-      if (err || results.length === 0) {
-        res.status(404).send('Note not found');
-        return;
-      }
-      
-      const note = results[0];
-      
-      // Check if note is private and user is not the owner
-      if (!note.is_public && (!req.session.userId || note.author_id !== req.session.userId)) {
-        res.status(403).send('Access denied. This is a private note.');
-        return;
-      }
-      
-      // Escape HTML content for display
-      note.content = escapeHtml(note.content);
-      
-      res.render('note', { note, user: req.session.username || null });
-    }
-  );
+  // Just render the page template, let JavaScript fetch the actual note data
+  res.render('note', { noteId, user: req.session.username || null });
 });
 
 // API endpoint for note access
@@ -322,6 +315,85 @@ app.post('/backup-notes', requireAuth, (req, res) => {
       res.send('Backup created successfully');
     }
   });
+});
+
+// Link preview feature for notes
+app.post('/api/link-preview', (req, res) => {
+  const { url } = req.body;
+  
+  if (!url) {
+    return res.status(400).json({ error: 'URL required' });
+  }
+  
+  // Basic URL validation
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return res.status(400).json({ error: 'Invalid URL format' });
+  }
+  
+  const protocol = url.startsWith('https://') ? https : http;
+  
+  protocol.get(url, (response) => {
+    let data = '';
+    
+    response.on('data', (chunk) => {
+      data += chunk;
+      // Limit response size
+      if (data.length > 100000) {
+        response.destroy();
+        return res.status(400).json({ error: 'Response too large' });
+      }
+    });
+    
+    response.on('end', () => {
+      // Return full response for client-side processing
+      res.json({
+        url: url,
+        status: response.statusCode,
+        headers: response.headers,
+        body: data,
+        contentType: response.headers['content-type'] || 'unknown'
+      });
+    });
+  }).on('error', (err) => {
+    res.status(500).json({ error: 'Failed to fetch URL' });
+  });
+});
+
+// Application health status endpoint
+app.get('/health', (req, res) => {
+  const { env, debug } = req.query;
+  
+  const healthInfo = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    database: {
+      connected: db.state === 'authenticated',
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER
+    },
+    server: {
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      version: process.version,
+      env: process.env.NODE_ENV || 'development'
+    }
+  };
+  
+  // Debug mode: show specific environment variable
+  if (env) {
+    healthInfo.debug = {
+      requested_var: env,
+      value: process.env[env] || 'Not found'
+    };
+  }
+  
+  // Full debug mode: show all environment variables
+  if (debug === 'true') {
+    healthInfo.environment = process.env;
+  }
+  
+  res.json(healthInfo);
 });
 
 // Serve static files normally for legitimate files

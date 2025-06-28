@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= note.title %> - Vulnerable Notes App</title>
+    <title>Loading Note - Notes App</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
@@ -30,20 +30,70 @@
             <a href="/logout">Logout</a>
         </div>
         
-        <div class="note-header">
-            <h1 class="note-title"><%= note.title %></h1>
-            <div class="note-meta">
-                By: <%= note.author %> | 
-                <%= note.is_public ? 'Public' : 'Private' %> | 
-                Created: <%= new Date(note.created_at).toLocaleString() %>
-            </div>
+        <div id="loading" style="text-align: center; margin: 50px 0;">
+            <p>Loading note...</p>
         </div>
         
-        <div class="note-content">
-            <%- note.content %>
+        <div id="note-content" style="display: none;">
+            <div class="note-header">
+                <h1 class="note-title" id="note-title"></h1>
+                <div class="note-meta" id="note-meta"></div>
+            </div>
+            
+            <div class="note-content" id="note-text"></div>
+        </div>
+        
+        <div id="error-message" style="display: none; color: red; text-align: center; margin: 50px 0;">
+            <p>Error loading note.</p>
         </div>
         
         <a href="/dashboard" class="btn">Back to Dashboard</a>
     </div>
+
+    <script>
+        // Fetch note data from API
+        async function loadNote() {
+            try {
+                const response = await fetch('/api/notes/<%= noteId %>');
+                
+                if (!response.ok) {
+                    throw new Error('Note not found');
+                }
+                
+                const note = await response.json();
+                
+                // Basic HTML escaping function (same as server-side)
+                function escapeHtml(text) {
+                    return text.replace('<', '&lt;').replace('>', '&gt;');
+                }
+                
+                // Update page title
+                document.title = note.title + ' - Notes App';
+                
+                // Populate note data
+                document.getElementById('note-title').textContent = note.title;
+                document.getElementById('note-meta').innerHTML = `
+                    By: ${note.author} | 
+                    ${note.is_public ? 'Public' : 'Private'} | 
+                    Created: ${new Date(note.created_at).toLocaleString()}
+                `;
+                
+                // Display note content with HTML escaping
+                document.getElementById('note-text').innerHTML = escapeHtml(note.content);
+                
+                // Show content, hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('note-content').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading note:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+            }
+        }
+        
+        // Load note when page loads
+        document.addEventListener('DOMContentLoaded', loadNote);
+    </script>
 </body>
 </html> 
