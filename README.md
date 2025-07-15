@@ -26,7 +26,7 @@ CREATE DATABASE noteapp;
 2.2 using docker
 ```bash
 docker run --name=notes-mysql -p3306:3306 -e 'MYSQL_ROOT_HOST=%' \
-  -e MYSQL_DATABASE=noteapp -e MYSQL_ROOT_PASSWORD=your_mysql_password -d mysql/mysql-server
+  -e MYSQL_DATABASE=noteapp -e MYSQL_ROOT_PASSWORD=your_mysql_password -d mysql/mysql-server && sleep 20 # let the DB initialize
 ```
 Note: root password (your_mysql_password) should be changed
 
