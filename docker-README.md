@@ -13,7 +13,6 @@ docker-compose down
 ## Access
 
 - App: http://localhost:3000
-- phpMyAdmin: http://localhost:8080
 
 ## Reset Database
 

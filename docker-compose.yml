@@ -39,28 +39,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - demo-app-network
     command: npm start
 
-  # Optional: phpMyAdmin for database management
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: demo-app-phpmyadmin
-    restart: unless-stopped
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_ARBITRARY: 1
-    depends_on:
-      - db
-    networks:
-      - demo-app-network
+
 
 volumes:
   mysql_data:
