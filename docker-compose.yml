@@ -11,6 +11,7 @@ services:
       MYSQL_DATABASE: noteapp
       MYSQL_USER: appuser
       MYSQL_PASSWORD: apppassword
+      MYSQL_ROOT_HOST: "%"
     ports:
       - "3306:3306"
     volumes:
