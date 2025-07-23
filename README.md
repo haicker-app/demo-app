@@ -2,18 +2,19 @@
 
 A simple vibe-coded Node.js Express note-taking application with user authentication and public/private note sharing.
 
+## Quick start with docker
+
+```bash
+export DB_PASSWORD=your_password
+docker compose up
+```
+
 ## Setup Instructions
 
 ### Prerequisites
 - Node.js (v14 or higher)
 - MySQL Server
 - npm
-
-### Quick start
-
-```bash
-DB_PASSWORD=your_password docker compose up
-```
 
 ### Installation
 
