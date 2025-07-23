@@ -9,6 +9,12 @@ A simple vibe-coded Node.js Express note-taking application with user authentica
 - MySQL Server
 - npm
 
+### Quick start
+
+```bash
+DB_PASSWORD=your_password docker compose up
+```
+
 ### Installation
 
 1. Install dependencies:
