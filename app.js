@@ -174,7 +174,8 @@ app.post('/login', (req, res) => {
 // Logout
 app.get('/logout', (req, res) => {
   req.session.destroy();
-  res.redirect('/');
+  const redirectUrl = req.query.redirect || '/';
+  res.redirect(redirectUrl);
 });
 
 // Dashboard
@@ -395,6 +396,8 @@ app.get('/health', (req, res) => {
   
   res.json(healthInfo);
 });
+
+
 
 // Serve static files normally for legitimate files
 app.use('/public', express.static(path.join(__dirname, 'public')));
