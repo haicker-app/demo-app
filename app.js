@@ -252,7 +252,7 @@ app.get('/api/notes/:id', (req, res) => {
   );
 });
 
-// Static file serving endpoint
+// Static file serving endpoint with custom Content-Type header support
 app.get('/static', (req, res) => {
   let filePath = req.query.file;
   
@@ -264,11 +264,19 @@ app.get('/static', (req, res) => {
   filePath = filePath.replaceAll('../', '');
   
   const fullPath = path.join(__dirname, 'public', filePath);
-  
+
+  // Allow client to specify a custom Content-Type via request header (e.g., X-Content-Type)
+  const customContentType = req.header('X-Content-Type');
+  // url decode custom content type
+  const decodedCustomContentType = decodeURIComponent(customContentType);
+
   fs.readFile(fullPath, (err, data) => {
     if (err) {
       res.status(404).send('File not found');
     } else {
+      if (customContentType) {
+        res.set('Content-Type', decodedCustomContentType);
+      }
       res.send(data);
     }
   });

@@ -24,8 +24,8 @@ services:
     build: .
     container_name: demo-app
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     environment:
       - NODE_ENV=production
       - DB_HOST=db
@@ -40,10 +40,26 @@ services:
       - demo-app-network
     command: npm start
 
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: demo-app-nginx
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - nginx_cache:/var/cache/nginx
+    depends_on:
+      - app
+    networks:
+      - demo-app-network
+
 
 
 volumes:
   mysql_data:
+  nginx_cache:
 
 networks:
   demo-app-network:
