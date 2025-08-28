@@ -172,7 +172,7 @@ app.post('/login', (req, res) => {
 });
 
 // Logout
-app.get('/logout', (req, res) => {
+app.get('/logout', requireAuth, (req, res) => {
   req.session.destroy();
   const redirectUrl = req.query.redirect || '/';
   res.redirect(redirectUrl);
