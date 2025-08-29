@@ -276,6 +276,8 @@ app.get('/static', (req, res) => {
     } else {
       if (customContentType) {
         res.set('Content-Type', decodedCustomContentType);
+      } else {
+        res.set('Content-Type', 'text/css'); // css
       }
       res.send(data);
     }
