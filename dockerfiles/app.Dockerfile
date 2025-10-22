@@ -5,6 +5,12 @@ FROM node:18-slim
 # Set the working directory.
 WORKDIR /usr/src/app
 
+# Change ownership of the app directory to the "node" user.
+RUN chown -R node:node /usr/src/app
+
+# Switch to the non-root "node" user.
+USER node
+
 # Copy package files and install dependencies.
 # This is done in a separate step to leverage Docker's layer cache.
 COPY package*.json ./
@@ -12,12 +18,6 @@ RUN npm install
 
 # Copy the rest of the application code.
 COPY . .
-
-# Change ownership of the app directory to the "node" user.
-RUN chown -R node:node /usr/src/app
-
-# Switch to the non-root "node" user.
-USER node
 
 # Expose the port the app runs on.
 EXPOSE 3000

@@ -10,22 +10,16 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-S6m2GWm5tmaRT}
       MYSQL_DATABASE: noteapp
       MYSQL_ROOT_HOST: "%"
-    ports:
-      - "3306:3306"
-    networks:
-      - demo-app-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
+      interval: 5s
 
   # Node.js Application
   app:
-    build: .
-    container_name: demo-app
+    image: docker.registry.haicker.app/demo-app-app:latest
     restart: unless-stopped
-    expose:
-      - "3000"
     environment:
       - NODE_ENV=production
       - DB_HOST=db
@@ -36,31 +30,18 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - demo-app-network
     command: npm start
 
   # Nginx Reverse Proxy
   nginx:
-    image: nginx:alpine
-    container_name: demo-app-nginx
+    image: docker.registry.haicker.app/demo-app-nginx:latest
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - nginx_cache:/var/cache/nginx
+    environment:
+      - SERVICE_FQDN_APP_3000
     depends_on:
       - app
-    networks:
-      - demo-app-network
-
-
 
 volumes:
-  mysql_data:
   nginx_cache:
-
-networks:
-  demo-app-network:
-    driver: bridge 
