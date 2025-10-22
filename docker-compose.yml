@@ -37,6 +37,6 @@ services:
     image: docker.registry.haicker.app/demo-app-nginx:latest
     restart: unless-stopped
     environment:
-      - SERVICE_FQDN_APP_3000
+      - SERVICE_URL_APP_3000
     depends_on:
       - app
