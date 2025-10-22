@@ -36,12 +36,7 @@ services:
   nginx:
     image: docker.registry.haicker.app/demo-app-nginx:latest
     restart: unless-stopped
-    volumes:
-      - nginx_cache:/var/cache/nginx
     environment:
       - SERVICE_FQDN_APP_3000
     depends_on:
       - app
-
-volumes:
-  nginx_cache:
